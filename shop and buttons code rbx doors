@@ -52,7 +52,11 @@ local function setup()
 	show(b,"Seasonal")
 	show(b,"Collab")
 
-	bottom.Visible=true
+	if not bottom:GetAttribute("BottomInitialized") then
+		bottom.Visible=true
+		bottom:SetAttribute("BottomInitialized",true)
+	end
+
 	show(bottom,"ButtonCollab")
 	side.Visible=true
 
@@ -63,9 +67,12 @@ local function setup()
 		local function connect(v)
 			if v:GetAttribute("GuiHooked") then return end
 			v:SetAttribute("GuiHooked",true)
+
 			v.Activated:Connect(function()
 				local g=lobby:FindFirstChild(gui)
-				if g then g.Visible=not g.Visible end
+				if g then
+					g.Visible=not g.Visible
+				end
 			end)
 		end
 
@@ -73,7 +80,9 @@ local function setup()
 			connect(button)
 		else
 			for _,v in ipairs(button:GetDescendants()) do
-				if v:IsA("GuiButton") then connect(v) end
+				if v:IsA("GuiButton") then
+					connect(v)
+				end
 			end
 		end
 	end
@@ -87,9 +96,12 @@ local function setup()
 	local function closeHook(n)
 		local menu=lobby:FindFirstChild(n)
 		if not menu then return end
+
 		local close=menu:FindFirstChild("CloseButton",true)
+
 		if close and close:IsA("GuiButton") and not close:GetAttribute("CloseHooked") then
 			close:SetAttribute("CloseHooked",true)
+
 			close.Activated:Connect(function()
 				menu.Visible=false
 			end)
@@ -104,6 +116,7 @@ end
 local function queue()
 	if queued then return end
 	queued=true
+
 	task.delay(.2,function()
 		queued=false
 		setup()
