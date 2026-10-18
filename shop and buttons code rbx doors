@@ -1,3 +1,4 @@
+
 local player=game:GetService("Players").LocalPlayer
 local pg=player:WaitForChild("PlayerGui")
 local queued=false
@@ -21,6 +22,14 @@ local function setup()
 	local function show(p,n)
 		local v=p:FindFirstChild(n)
 		if v then v.Visible=true end
+	end
+
+	-- Show EventCoins and Gold
+	local top=pg:FindFirstChild("TopbarUI")
+	local bar=top and top:FindFirstChild("Topbar")
+	if bar then
+		show(bar,"EventCoins")
+		show(bar,"Gold")
 	end
 
 	show(x,"Collab")
@@ -92,6 +101,19 @@ local function setup()
 	hook(side:FindFirstChild("ButtonShop"),"ShopOld")
 	hook(side:FindFirstChild("ButtonSettings"),"SettingsOld")
 	hook(side:FindFirstChild("ButtonCredits"),"CreditsScreenOld")
+
+	-- Hide bottom buttons when another bottom button is clicked, except Voice Chat
+	for _,button in ipairs(bottom:GetDescendants()) do
+		if button:IsA("GuiButton")
+			and button.Name~="ButtonVoiceChat"
+			and not button:GetAttribute("BottomHideHooked") then
+
+			button:SetAttribute("BottomHideHooked",true)
+			button.Activated:Connect(function()
+				bottom.Visible=false
+			end)
+		end
+	end
 
 	local function closeHook(n)
 		local menu=lobby:FindFirstChild(n)
